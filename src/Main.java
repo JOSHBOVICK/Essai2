@@ -1,11 +1,14 @@
-import java.io.OptionalDataException;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
+        String[] bookTitles = loadBookTitlesFromFile("livres.txt");
         Scanner scanner = new Scanner(System.in);
         System.out.println("1. Ajouter un livre");
         System.out.println("2. Supprimer un livre");
@@ -75,7 +78,8 @@ public class Main {
             System.out.println("- " + title);
         }
     }
-        public static void deleteBookTitle(Scanner scanner) {
+
+    public static void deleteBookTitle(Scanner scanner) {
         System.out.print("Quel livre voulez-vous supprimer ? ");
         String bookToDelete = scanner.nextLine();
 
@@ -99,7 +103,9 @@ public class Main {
             System.out.println("Le livre '" + bookToDelete + "' n'a pas été trouvé dans la liste.");
         }
         deleteBookTitle(scanner);
+        saveBookTitlesToFile(bookTitles, "livres.txt");
     }
+
     public static void modifyBookTitle(Scanner scanner) {
         System.out.print("Quel livre voulez-vous modifier ? ");
         String bookToModify = scanner.nextLine();
@@ -121,6 +127,7 @@ public class Main {
         }
         modifyBookTitle(scanner);
     }
+
     public static void searchBookTitle(Scanner scanner) {
         System.out.print("Quel livre voulez-vous rechercher ? ");
         String bookToSearch = scanner.nextLine();
@@ -162,11 +169,13 @@ public class Main {
         }
         listBooksByFirstLetter(scanner);
     }
-    public static void displayBookCount(Scanner scanner){
+
+    public static void displayBookCount(Scanner scanner) {
         OptionalDataException bookTitles = null;
         int bookCount = bookTitles.length;
         System.out.println("Nombre de livres enregistrés : " + bookCount);
     }
+
     public static void displayBookDetails(Scanner scanner) {
         int index = -1;
         Object[] bookTitles = new Object[0];
@@ -185,6 +194,7 @@ public class Main {
         System.out.println("Détails du livre:");
         System.out.println("Titre: " + bookTitles[index]);
     }
+
     public static void sortBooksByTitle(Scanner scanner) {
         // Créer un tableau d'index pour garder la trace des indices d'origine
         Comparable<Object>[] bookTitles = new Comparable[0];
@@ -207,6 +217,57 @@ public class Main {
         for (int i = 0; i < bookTitles.length; i++) {
             System.out.println("Titre: " + bookTitles[i]);
             System.out.println();
+        }
+    }
+
+    public static void saveBookTitlesToFile(String[] bookTitles, String fileName) {
+        try {
+            FileWriter writer = new FileWriter(fileName);
+            for (String title : bookTitles) {
+                writer.write(title + "\n");
+            }
+            writer.close();
+            System.out.println("Les informations des livres ont été sauvegardées dans le fichier " + fileName);
+        } catch (IOException e) {
+            System.out.println("Une erreur s'est produite lors de la sauvegarde des informations des livres dans le fichier " + fileName);
+        }
+    }
+
+    public static String[] loadBookTitlesFromFile(String fileName) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
+            List<String> bookTitles = new ArrayList<>();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                bookTitles.add(line);
+            }
+            reader.close();
+            System.out.println("Les informations des livres ont été chargées à partir du fichier " + fileName);
+            return bookTitles.toArray(new String[0]);
+        } catch (IOException e) {
+            System.out.println("Une erreur s'est produite lors du chargement des informations des livres à partir du fichier " + fileName);
+            return new String[0];
+        }
+    }
+
+    public class BookNotFoundException extends Exception {
+        public BookNotFoundException(String message) {
+            super(message);
+        }
+
+        public static void searchBookTitle(Scanner scanner) {
+            System.out.println("Veuillez entrer le titre du livre à rechercher :");
+            String searchTitle = scanner.nextLine();
+
+            String foundTitle = null;
+            System.out.println("Le livre \"" + foundTitle + "\" a été trouvé.");
+
+            searchBookTitle(scanner);
+        }
+
+        public String findBookTitle(String searchTitle) throws BookNotFoundException {
+            // ...
+            throw new BookNotFoundException(searchTitle);
         }
     }
 }
